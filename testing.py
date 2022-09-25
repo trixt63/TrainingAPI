@@ -1,5 +1,6 @@
 import unittest
 from tests.books_test import BooksTests
+# from tests.users_test import UsersTests
 
 
 if __name__ == '__main__':

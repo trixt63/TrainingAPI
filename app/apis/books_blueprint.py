@@ -18,15 +18,15 @@ books_bp = Blueprint('books_blueprint', url_prefix='/books')
 _db = MongoDB()
 
 
-@books_bp.route('/')
+@books_bp.get('/')
 async def get_all_books(request):
     # TODO: use cache to optimize api
-    async with request.app.ctx.redis as r:
-        books = await get_cache(r, CacheConstants.all_books)
-        if books is None:
-            book_objs = _db.get_books()
-            books = [book.to_dict() for book in book_objs]
-            await set_cache(r, CacheConstants.all_books, books)
+    # async with request.app.ctx.redis as r:
+    #     books = await get_cache(r, CacheConstants.all_books)
+    #     if books is None:
+    #         book_objs = _db.get_books()
+    #         books = [book.to_dict() for book in book_objs]
+    #         await set_cache(r, CacheConstants.all_books, books)
 
     book_objs = _db.get_books()
     books = [book.to_dict() for book in book_objs]
@@ -68,7 +68,7 @@ async def get_book(request, book_id):
     return json(book)
 
 @books_bp.route('/<book_id>', methods={'PUT'})
-@protected
+# @protected
 async def update_book(request, book_id):
     body = request.json
     # decode token
@@ -77,8 +77,9 @@ async def update_book(request, book_id):
     username = payload.get('username')
 
     book_obj = Book(book_id).from_dict(body)
-
-    updated = _db.update_book(filter_={'_id':book_id, 'username':username}, book=book_obj)
+    book_obj.owner = username
+    #
+    updated = _db.update_book(filter_={'_id':book_id, 'owner': username}, book=book_obj)
     if not updated:
         raise ApiInternalError('Fail to update book')
 

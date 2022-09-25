@@ -1,0 +1,12 @@
+{
+  "register": {
+    "username": "MarkZuckerberg",
+    "password": "12345678"
+  },
+  "book": {
+    "title": "Frankenstein",
+    "authors": ["Shelley, Mary"],
+    "publisher": "Gutenberg project",
+    "description": "A scientist created a conscious monster"
+  }
+}
