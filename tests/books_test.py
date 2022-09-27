@@ -24,6 +24,7 @@ class BooksTests(unittest.TestCase):
         data = json.loads(response.text)
         books = data.get('books')
         book_id = books[-1].get('_id')  # get _id of the last book
+        print(f"Book: {books[-1]}")
         # get book by id
         requests, response = app.test_client.get(f'/books/{book_id}')
         self.assertEqual(response.status, 200)
@@ -77,24 +78,24 @@ class BooksTests(unittest.TestCase):
             f'/books/{book_id}', data=json.dumps(update_info), headers={"Authorization": jw_token})
         self.assertEqual(response.status, 200)
 
-    def test_delete_book(self):
-        # login
-        login_info = {
-            "username": "MarkZuckerberg",
-            "password": "12345678",
-        }
-        request, response = app.test_client.post('/users/login', data=json.dumps(login_info))
-        data = json.loads(response.text)
-        jw_token = data.get('jwt')
-        # get id of a book
-        request, response = app.test_client.get('/books')
-        data = json.loads(response.text)
-        books = data.get('books')
-        book_id = books[-1].get('_id')  # get _id of the last book
-        # test delete book
-        request, response = app.test_client.delete(
-            f'/books/{book_id}', headers={"Authorization": jw_token})
-        self.assertEqual(response.status, 200)
+    # def test_delete_book(self):
+    #     # login
+    #     login_info = {
+    #         "username": "MarkZuckerberg",
+    #         "password": "12345678",
+    #     }
+    #     request, response = app.test_client.post('/users/login', data=json.dumps(login_info))
+    #     data = json.loads(response.text)
+    #     jw_token = data.get('jwt')
+    #     # get id of a book
+    #     request, response = app.test_client.get('/books')
+    #     data = json.loads(response.text)
+    #     books = data.get('books')
+    #     book_id = books[-1].get('_id')  # get _id of the last book
+    #     # test delete book
+    #     request, response = app.test_client.delete(
+    #         f'/books/{book_id}', headers={"Authorization": jw_token})
+    #     self.assertEqual(response.status, 200)
 
 
 if __name__ == '__main__':

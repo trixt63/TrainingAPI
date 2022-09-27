@@ -11,25 +11,34 @@ from app.decorators.auth import protected
 from app.decorators.json_validator import validate_with_jsonschema
 from app.hooks.error import ApiInternalError, ApiForbidden, ApiNotFound, ApiUnauthorized
 from app.models.book import create_book_json_schema, Book
+from app.utils.logger_utils import get_logger
 from config import Config
 
 books_bp = Blueprint('books_blueprint', url_prefix='/books')
 
 _db = MongoDB()
 
+logger = get_logger("Books blueprint")
 
 @books_bp.get('/')
 async def get_all_books(request):
     # TODO: use cache to optimize api
     async with request.app.ctx.redis as r:
+        logger.info('1')
         books = await get_cache(r, CacheConstants.all_books)
+        logger.info('2')
         if books is None:
-            book_objs = _db.get_books()
-            books = [book.to_dict() for book in book_objs]
-            await set_cache(r, CacheConstants.all_books, books)
+            try:
+                book_objs = _db.get_books()
+                books = [book.to_dict() for book in book_objs]
+                await set_cache(r, CacheConstants.all_books, books)
+            except Exception as ex:
+                logger.exception(ex)
+
 
     # book_objs = _db.get_books()
     # books = [book.to_dict() for book in book_objs]
+    logger.info('3')
     number_of_books = len(books)
     return json({
         'n_books': number_of_books,
