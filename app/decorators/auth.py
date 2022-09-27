@@ -20,6 +20,7 @@ def check_token(request):
 
 
 def protected(wrapped):
+    """Read the header, and pass the 'username' to the function"""
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):

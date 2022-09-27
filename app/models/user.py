@@ -16,7 +16,7 @@ class User:
         }
 
 
-register_json_schema = {
+user_json_schema = {
     'type': 'object',
     'properties': {
         'username': {'type': 'string'},

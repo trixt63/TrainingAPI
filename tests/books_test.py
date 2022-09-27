@@ -37,7 +37,8 @@ class BooksTests(unittest.TestCase):
             "password": "12345678",
         }
         request, response = app.test_client.post('/users/login', data=json.dumps(user_info))
-        jw_token = response.text
+        data = json.loads(response.text)
+        jw_token = data.get('jwt')
         # test create book
         book_info = {
             "title": "Frankenstein",
@@ -50,13 +51,6 @@ class BooksTests(unittest.TestCase):
         self.assertEqual(response.status, 200)
 
     def test_update_book(self):
-        # login
-        login_info = {
-            "username": "MarkZuckerberg",
-            "password": "12345678",
-        }
-        request, response = app.test_client.post('/users/login', data=json.dumps(login_info))
-        jw_token = response.text
         # get id of a book
         request, response = app.test_client.get('/books')
         data = json.loads(response.text)
@@ -69,7 +63,8 @@ class BooksTests(unittest.TestCase):
             "password": "12345678",
         }
         request, response = app.test_client.post('/users/login', data=json.dumps(login_info))
-        jw_token = response.text
+        data = json.loads(response.text)
+        jw_token = data.get('jwt')
         # test update book
         update_info = {
             'title': books[-1].get('title') + " (updated)",
@@ -89,7 +84,8 @@ class BooksTests(unittest.TestCase):
             "password": "12345678",
         }
         request, response = app.test_client.post('/users/login', data=json.dumps(login_info))
-        jw_token = response.text
+        data = json.loads(response.text)
+        jw_token = data.get('jwt')
         # get id of a book
         request, response = app.test_client.get('/books')
         data = json.loads(response.text)

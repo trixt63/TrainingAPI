@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError
 
 from app.constants.mongodb_constants import MongoCollections
 from app.models.book import Book
@@ -47,7 +48,7 @@ class MongoDB:
     def get_book_by_id(self, book_id):
         try:
             gotten_book = self._books_col.find_one({'_id': book_id})
-            return gotten_book
+            return Book().from_dict(gotten_book)
         except Exception as ex:
             logger.exception(ex)
         return None
@@ -73,8 +74,11 @@ class MongoDB:
         try:
             inserted_doc = self._users_col.insert_one(user.to_dict())
             return inserted_doc
+        except DuplicateKeyError:
+            return "duplicated"
         except Exception as ex:
             logger.exception(ex)
+
         return None
 
     def get_user(self, _id=''):
@@ -82,5 +86,6 @@ class MongoDB:
             user_info = self._users_col.find_one({'_id': _id})
             return user_info
         except Exception as ex:
+            print(f"Exception: {ex}")
             logger.exception(ex)
         return None
