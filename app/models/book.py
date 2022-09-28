@@ -46,3 +46,19 @@ create_book_json_schema = {
     },
     'required': ['title', 'authors', 'publisher']
 }
+
+update_book_json_schema = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'authors': {'type': 'array', 'items': {'type': 'string'}},
+        'publisher': {'type': 'string'},
+        'description': {'type': 'string'},
+    },
+    'anyOf': [
+        {'required': ['title']},
+        {'required': ['authors']},
+        {'required': ['publisher']},
+        {'required': ['description']}
+    ]
+}

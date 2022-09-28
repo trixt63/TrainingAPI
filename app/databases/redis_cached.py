@@ -1,7 +1,7 @@
 import json
 
 
-async def set_cache(r, key, value, ttl=300):
+async def set_cache(r, key, value, ttl=3):
     await r.set(key, json.dumps(value), ex=ttl)
 
 

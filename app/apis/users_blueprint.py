@@ -43,7 +43,7 @@ async def log_in(request):
     b_password = bytes(body.get('password'), 'utf-8')
     user_info = _db.get_user(username)
     if user_info is None:
-        raise ApiUnauthorized("User not found")
+        raise ApiBadRequest("User not found")
     hashed_password = user_info.get('password')
     if bcrypt.checkpw(b_password, hashed_password):
         # generate JWT
@@ -53,4 +53,4 @@ async def log_in(request):
             'jwt': token
         })
     else:
-        raise ApiUnauthorized("Wrong password")
+        raise ApiBadRequest("Wrong password")

@@ -10,7 +10,7 @@ from app.databases.redis_cached import get_cache, set_cache
 from app.decorators.auth import protected
 from app.decorators.json_validator import validate_with_jsonschema
 from app.hooks.error import ApiInternalError, ApiForbidden, ApiNotFound, ApiUnauthorized
-from app.models.book import create_book_json_schema, Book
+from app.models.book import Book, create_book_json_schema, update_book_json_schema
 from app.utils.logger_utils import get_logger
 from config import Config
 
@@ -24,9 +24,7 @@ logger = get_logger("Books blueprint")
 async def get_all_books(request):
     # TODO: use cache to optimize api
     async with request.app.ctx.redis as r:
-        logger.info('1')
         books = await get_cache(r, CacheConstants.all_books)
-        logger.info('2')
         if books is None:
             try:
                 book_objs = _db.get_books()
@@ -35,10 +33,6 @@ async def get_all_books(request):
             except Exception as ex:
                 logger.exception(ex)
 
-
-    # book_objs = _db.get_books()
-    # books = [book.to_dict() for book in book_objs]
-    logger.info('3')
     number_of_books = len(books)
     return json({
         'n_books': number_of_books,
@@ -80,7 +74,7 @@ async def get_book(request, book_id):
 
 
 @books_bp.route('/<book_id>', methods={'PUT'})
-@validate_with_jsonschema(create_book_json_schema)  # To validate request body
+@validate_with_jsonschema(update_book_json_schema)  # To validate request body
 @protected
 async def update_book(request, book_id, username=None):
     body = request.json
@@ -93,6 +87,13 @@ async def update_book(request, book_id, username=None):
     if to_be_updated.owner != username:
         raise ApiForbidden('You are not the owner')  # raise 403 Forbidden
     else:
+        # check if fields are null, then fill the null fields
+        book_dict = book_obj.to_dict()
+        to_be_updated_dict = to_be_updated.to_dict()
+        for attr, val in book_dict.items():
+            if val is None or val == "":
+                book_dict[attr] = to_be_updated_dict[attr]
+        book_obj = Book(book_id).from_dict(book_dict)
         updated = _db.update_book(filter_={'_id':book_id}, book=book_obj)
 
     if not updated:
