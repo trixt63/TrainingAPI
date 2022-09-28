@@ -49,9 +49,12 @@ class MongoDB:
         try:
             gotten_book = self._books_col.find_one({'_id': book_id})
             return Book().from_dict(gotten_book)
+        except AttributeError:
+            logger.warning(f"Not found book")
+            return None
         except Exception as ex:
             logger.exception(ex)
-        return None
+            return None
 
     def update_book(self, book: Book, filter_=None):
         try:
