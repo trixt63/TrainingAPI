@@ -34,10 +34,11 @@ async def get_all_books(request):
                 logger.exception(ex)
 
     number_of_books = len(books)
-    return json({
-        'n_books': number_of_books,
-        'books': books
-    })
+    # return json({
+    #     'n_books': number_of_books,
+    #     'books': books
+    # })
+    return json(books)
 
 
 @books_bp.route('/', methods={'POST'})
